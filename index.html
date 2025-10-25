@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Escalas - tabombandoagora.info</title>
+<style>
+body{margin:0;padding:0;font-family:system-ui,-apple-system,sans-serif;background:linear-gradient(135deg,#EFF6FF,#E0E7FF);min-height:100vh}.container{max-width:1400px;margin:0 auto;padding:1rem}.card{background:#fff;border-radius:1rem;box-shadow:0 10px 30px rgba(0,0,0,.1);padding:1.5rem;margin-bottom:1.5rem}h1{font-size:1.75rem;font-weight:700;color:#1F2937;margin-bottom:1rem}h2{font-size:1.25rem;font-weight:700;color:#1F2937;margin-bottom:1rem}.info-box{background:#EFF6FF;border-left:4px solid #3B82F6;padding:1rem;border-radius:.5rem;font-size:.875rem;color:#1E40AF;margin-top:1rem}.info-box ol{margin-left:1.5rem;margin-top:.5rem}.input-group{display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap}input[type=text]{flex:1;min-width:200px;padding:.75rem;border:2px solid #D1D5DB;border-radius:.5rem;font-size:1rem}input[type=text]:focus{outline:0;border-color:#4F46E5}.btn{padding:.75rem 1.5rem;border:none;border-radius:.5rem;font-weight:600;cursor:pointer;font-size:1rem;transition:all .2s}.btn-primary{background:#4F46E5;color:#fff}.btn-primary:hover{background:#4338CA}.btn-success{background:#10B981;color:#fff}.btn-success:hover{background:#059669}.btn-blue{background:#3B82F6;color:#fff}.btn-blue:hover{background:#2563EB}.btn-purple{background:#8B5CF6;color:#fff}.btn-purple:hover{background:#7C3AED}.btn-danger{background:0 0;border:none;color:#EF4444;padding:.25rem;cursor:pointer;font-size:1.25rem}.employee-tag{display:inline-flex;align-items:center;gap:.5rem;background:#EEF2FF;border:2px solid #C7D2FE;padding:.5rem .75rem;border-radius:.5rem;margin:.25rem}.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1rem}.form-group label{display:block;font-weight:600;font-size:.875rem;color:#374151;margin-bottom:.5rem}select{width:100%;padding:.625rem;border:2px solid #D1D5DB;border-radius:.5rem;font-size:1rem;cursor:pointer}.button-row{display:flex;gap:1rem;flex-wrap:wrap}.button-row .btn{flex:1;min-width:200px}.message{text-align:center;padding:.75rem;border-radius:.5rem;margin-top:1rem;font-weight:600;display:none}.message.success{background:#D1FAE5;color:#065F46;display:block}.table-container{overflow-x:auto;margin-top:1rem}table{width:100%;border-collapse:collapse;font-size:.875rem}td,th{border:2px solid #D1D5DB;padding:.625rem;text-align:center}th{background:#4F46E5;color:#fff;font-weight:700}td:first-child,th:first-child{position:sticky;left:0;background:inherit;font-weight:600;z-index:10}tbody tr:nth-child(even){background:#F9FAFB}tbody tr:nth-child(odd){background:#fff}td.trabalho{background:#D1FAE5!important;color:#065F46;cursor:pointer;font-weight:700}td.folga{background:#FEE2E2!important;color:#991B1B;cursor:pointer;font-weight:700}td.trabalho:hover{background:#A7F3D0!important}td.folga:hover{background:#FECACA!important}.feriado{background:#DC2626!important}.feriado::after{content:'🎉';font-size:.75rem;display:block}.day-cell{box-shadow:inset 0 0 0 2px #FCD34D}.legend{display:flex;gap:1.5rem;margin-top:1rem;flex-wrap:wrap;font-size:.875rem}.legend-item{display:flex;align-items:center;gap:.5rem}.legend-box{width:1.5rem;height:1.5rem;border:2px solid;border-radius:.25rem}.footer{text-align:center;padding:1.5rem;background:#fff;border-radius:1rem}.footer a{color:#4F46E5;text-decoration:none;font-weight:700;font-size:1.125rem}@media (max-width:768px){.container{padding:.5rem}.card{padding:1rem}h1{font-size:1.25rem}table{font-size:.75rem}td,th{padding:.375rem}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="card">
+<h1>📅 Sistema de Escalas de Trabalho</h1>
+<div class="info-box">
+<strong>📋 Como usar:</strong>
+<ol>
+<li>Adicione funcionários e escolha o tipo de escala</li>
+<li>Clique em "Gerar Escala Automática"</li>
+<li>Clique nos dias para alternar T (Trabalho) / F (Folga)</li>
+<li>Salve e exporte quando terminar</li>
+</ol>
+</div>
+</div>
+<div class="card">
+<h2>👥 Gerenciar Funcionários</h2>
+<div class="input-group">
+<input type="text" id="employeeName" placeholder="Nome do funcionário"/>
+<button class="btn btn-primary" onclick="addEmployee()">+ Adicionar</button>
+</div>
+<div id="employeeList"></div>
+<div class="controls">
+<div class="form-group">
+<label>Tipo de Escala</label>
+<select id="scheduleType">
+<option value="6x1">6x1 (6 trabalha, 1 folga)</option>
+<option value="5x2">5x2 (5 trabalha, 2 folga)</option>
+<option value="12x36">12x36 (12h, 36h folga)</option>
+</select>
+</div>
+<div class="form-group">
+<label>Mês</label>
+<select id="month"></select>
+</div>
+<div class="form-group">
+<label>Ano</label>
+<select id="year"></select>
+</div>
+<div class="form-group" style="display:flex;align-items:flex-end">
+<button class="btn btn-success" onclick="generateSchedule()" style="width:100%">🔄 Gerar Escala</button>
+</div>
+</div>
+<div class="button-row">
+<button class="btn btn-blue" onclick="saveData()">💾 Salvar</button>
+<button class="btn btn-purple" onclick="exportCSV()">📥 Exportar CSV</button>
+</div>
+<div id="message"></div>
+</div>
+<div class="card" id="scheduleCard" style="display:none">
+<h2 id="scheduleTitle"></h2>
+<div class="table-container">
+<table id="scheduleTable"></table>
+</div>
+<div class="legend">
+<div class="legend-item">
+<div class="legend-box" style="background:#D1FAE5;border-color:#6EE7B7"></div>
+<span>T = Trabalho</span>
+</div>
+<div class="legend-item">
+<div class="legend-box" style="background:#FEE2E2;border-color:#FCA5A5"></div>
+<span>F = Folga</span>
+</div>
+<div class="legend-item">
+<div class="legend-box" style="background:#DC2626">🎉</div>
+<span>Feriados</span>
+</div>
+</div>
+</div>
+<div class="footer">
+<p style="color:#6B7280;margin-bottom:.5rem">✨ 100% Gratuito <a href="https://tabombandoagora.info">tabombandoagora.info</a></p>
+<p style="color:#9CA3AF;font-size:.875rem">🔒 Dados salvos automaticamente</p>
+</div>
+</div>
+
+<script>
+const months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const weekDays = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const holidays = {
+  '01-01':'Ano Novo',
+  '04-21':'Tiradentes',
+  '05-01':'Trabalho',
+  '09-07':'Independência',
+  '10-12':'Aparecida',
+  '11-02':'Finados',
+  '11-15':'Proclamação',
+  '11-20':'Consciência Negra',
+  '12-25':'Natal'
+};
+
+let employees = [];
+let schedules = {};
+
+function init() {
+  loadData();
+  populateMonths();
+  populateYears();
+  const input = document.getElementById('employeeName');
+  if(input) {
+    input.addEventListener('keypress', function(e) {
+      if(e.key === 'Enter') addEmployee();
+    });
+  }
+}
+
+function populateMonths() {
+  const select = document.getElementById('month');
+  if(!select) return;
+  months.forEach(function(m, i) {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = m;
+    select.appendChild(opt);
+  });
+  select.value = new Date().getMonth();
+}
+
+function populateYears() {
+  const select = document.getElementById('year');
+  if(!select) return;
+  for(let y = 2024; y <= 2030; y++) {
+    const opt = document.createElement('option');
+    opt.value = y;
+    opt.textContent = y;
+    select.appendChild(opt);
+  }
+  select.value = new Date().getFullYear();
+}
+
+function loadData() {
+  try {
+    const e = localStorage.getItem('tba-emp');
+    const s = localStorage.getItem('tba-sch');
+    if(e) employees = JSON.parse(e);
+    if(s) schedules = JSON.parse(s);
+    renderEmployees();
+  } catch(err) {
+    console.log('Primeira vez');
+  }
+}
+
+function saveData() {
+  try {
+    localStorage.setItem('tba-emp', JSON.stringify(employees));
+    localStorage.setItem('tba-sch', JSON.stringify(schedules));
+    showMessage('✓ Salvo com sucesso!', 'success');
+  } catch(err) {
+    showMessage('✗ Erro ao salvar', 'error');
+  }
+}
+
+function addEmployee() {
+  const input = document.getElementById('employeeName');
+  if(!input) return;
+  const name = input.value.trim();
+  if(name) {
+    employees.push({id: Date.now(), name: name});
+    input.value = '';
+    renderEmployees();
+    saveData();
+  }
+}
+
+function removeEmployee(id) {
+  if(confirm('Remover este funcionário?')) {
+    employees = employees.filter(function(e) { return e.id !== id; });
+    delete schedules[id];
+    renderEmployees();
+    saveData();
+    if(employees.length === 0) {
+      document.getElementById('scheduleCard').style.display = 'none';
+    }
+  }
+}
+
+function renderEmployees() {
+  const list = document.getElementById('employeeList');
+  if(!list) return;
+  if(employees.length === 0) {
+    list.innerHTML = '<p style="text-align:center;color:#9CA3AF;padding:1rem">Adicione funcionários para começar</p>';
+    return;
+  }
+  list.innerHTML = employees.map(function(emp) {
+    return '<div class="employee-tag"><span style="color:#3730A3;font-weight:500">' + emp.name + '</span><button class="btn-danger" onclick="removeEmployee(' + emp.id + ')" title="Remover">×</button></div>';
+  }).join('');
+}
+
+function getDaysInMonth(month, year) {
+  return new Date(year, month + 1, 0).getDate();
+}
+
+function getWeekDay(day, month, year) {
+  return new Date(year, month, day).getDay();
+}
+
+function getHoliday(day, month) {
+  const key = String(month + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+  return holidays[key];
+}
+
+function generateSchedule() {
+  if(employees.length === 0) {
+    alert('⚠️ Adicione funcionários antes de gerar a escala!');
+    return;
+  }
+  
+  const month = parseInt(document.getElementById('month').value);
+  const year = parseInt(document.getElementById('year').value);
+  const type = document.getElementById('scheduleType').value;
+  const days = getDaysInMonth(month, year);
+  
+  schedules = {};
+  
+  employees.forEach(function(emp, idx) {
+    const schedule = [];
+    for(let d = 1; d <= days; d++) {
+      let status = 'T';
+      
+      if(type === '6x1') {
+        if((d + idx * 2) % 7 === 0) status = 'F';
+      } else if(type === '5x2') {
+        const wd = getWeekDay(d, month, year);
+        const offset = idx % 2;
+        if((wd === 0 || wd === 6) && offset === 0) status = 'F';
+        if((wd === 1 || wd === 2) && offset === 1) status = 'F';
+      } else if(type === '12x36') {
+        if((d + idx) % 2 === 0) status = 'F';
+      }
+      
+      schedule.push(status);
+    }
+    schedules[emp.id] = schedule;
+  });
+  
+  renderSchedule();
+  saveData();
+  showMessage('✓ Escala gerada com sucesso!', 'success');
+}
+
+function renderSchedule() {
+  const month = parseInt(document.getElementById('month').value);
+  const year = parseInt(document.getElementById('year').value);
+  const days = getDaysInMonth(month, year);
+  
+  const title = document.getElementById('scheduleTitle');
+  const card = document.getElementById('scheduleCard');
+  const table = document.getElementById('scheduleTable');
+  
+  if(!title || !card || !table) return;
+  
+  title.textContent = '📅 Escala de ' + months[month] + ' de ' + year;
+  card.style.display = 'block';
+  
+  let html = '<thead><tr><th>Funcionário</th>';
+  
+  for(let d = 1; d <= days; d++) {
+    const wd = weekDays[getWeekDay(d, month, year)];
+    const hol = getHoliday(d, month);
+    html += '<th class="' + (hol ? 'feriado' : '') + '" title="' + (hol || d) + '">';
+    html += '<div style="font-size:.75rem">' + wd + '</div>';
+    html += '<div>' + d + '</div>';
+    html += '</th>';
+  }
+  
+  html += '</tr></thead><tbody>';
+  
+  employees.forEach(function(emp) {
+    html += '<tr><td style="text-align:left">' + emp.name + '</td>';
+    
+    for(let d = 0; d < days; d++) {
+      const status = (schedules[emp.id] && schedules[emp.id][d]) || 'T';
+      const hol = getHoliday(d + 1, month);
+      const className = status === 'T' ? 'trabalho' : 'folga';
+      const dayClass = hol ? 'day-cell' : '';
+      
+      html += '<td class="' + className + ' ' + dayClass + '" ';
+      html += 'onclick="toggleDay(' + emp.id + ',' + d + ')" ';
+      html += 'title="' + (status === 'T' ? 'Trabalho' : 'Folga');
+      if(hol) html += ' - ' + hol;
+      html += '\nClique para alternar">';
+      html += status + '</td>';
+    }
+    
+    html += '</tr>';
+  });
+  
+  html += '</tbody>';
+  table.innerHTML = html;
+}
+
+function toggleDay(empId, dayIndex) {
+  if(!schedules[empId]) schedules[empId] = [];
+  schedules[empId][dayIndex] = schedules[empId][dayIndex] === 'T' ? 'F' : 'T';
+  renderSchedule();
+}
+
+function exportCSV() {
+  if(employees.length === 0) {
+    alert('⚠️ Adicione funcionários antes de exportar!');
+    return;
+  }
+  
+  const month = parseInt(document.getElementById('month').value);
+  const year = parseInt(document.getElementById('year').value);
+  const type = document.getElementById('scheduleType').value;
+  const days = getDaysInMonth(month, year);
+  
+  let csv = '\ufeff';
+  csv += 'Escala de Trabalho - ' + months[month] + '/' + year + '\n';
+  csv += 'Tipo: ' + type + '\n';
+  csv += 'Gerado em: ' + new Date().toLocaleDateString('pt-BR') + '\n\n';
+  csv += 'Funcionário,';
+  
+  for(let d = 1; d <= days; d++) {
+    const wd = weekDays[getWeekDay(d, month, year)];
+    csv += d + ' (' + wd + '),';
+  }
+  csv += '\n';
+  
+  employees.forEach(function(emp) {
+    csv += emp.name + ',';
+    const schedule = schedules[emp.id] || [];
+    for(let i = 0; i < days; i++) {
+      csv += (schedule[i] || 'T') + ',';
+    }
+    csv += '\n';
+  });
+  
+  csv += '\n\nLegenda:\nT = Trabalho\nF = Folga\n';
+  
+  const blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'escala_' + months[month] + '_' + year + '.csv';
+  link.click();
+  
+  showMessage('✓ CSV exportado com sucesso!', 'success');
+}
+
+function showMessage(text, type) {
+  const msg = document.getElementById('message');
+  if(!msg) return;
+  msg.textContent = text;
+  msg.className = 'message ' + type;
+  msg.style.display = 'block';
+  setTimeout(function() {
+    msg.style.display = 'none';
+  }, 3000);
+}
+
+if(document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+</script>
+</body>
+</html>
